@@ -1,0 +1,24 @@
+{
+  "name": "examples__js_console_command_executer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "console-command-executer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nedzelskiy/examples__js_console_command_executer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nedzelskiy/examples__js_console_command_executer/issues"
+  },
+  "homepage": "https://github.com/nedzelskiy/examples__js_console_command_executer#readme",
+  "devDependencies": {
+    "ps-node": "^0.1.6",
+    "shell-quote": "^1.6.1",
+    "terminate": "^2.1.0"
+  }
+}
