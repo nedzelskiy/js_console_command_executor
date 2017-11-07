@@ -25,7 +25,7 @@ const availableCommands = {
     'exit': {
         run: function() {
             const signal = 'SIGTERM';
-            terminate(process.id, 'SIGTERM', err => {
+            terminate(process.pid, 'SIGTERM', err => {
                 if (err) {
                     console.error(err);
                 } else {

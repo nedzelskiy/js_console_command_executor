@@ -6,6 +6,7 @@ const parse = require('shell-quote').parse;
 const FILENAME = `js-console-command-executor: pid[${ process.pid }]`;
 
 let buffer = '';
+let cursorPosition = 0;
 let typedCommands = [];
 let typedCommandsPointer = -1;
 
@@ -17,11 +18,20 @@ const keyHandler = (commands, key) => {
             process.stdout.cursorTo(0);
             process.stdout.write(typedCommands[typedCommandsPointer]);
             buffer = typedCommands[typedCommandsPointer];
+            cursorPosition = (buffer.length - 1);
         } else {
             process.stdout.clearLine();  // clear current text
             process.stdout.cursorTo(0);
         }
+    } else if (key == '\u0008') { //backspace
+        process.stdout.clearLine();
+        process.stdout.cursorTo(0);
+        buffer = buffer.substring(0, cursorPosition);
+        process.stdout.write(buffer);
+        cursorPosition = (buffer.length - 1) | 0;
+        // console.log("\r\n", cursorPosition, buffer, "\r\n");
     } else if (key == '\u001B\u005B\u0043') { // right
+
     } else if (key == '\u001B\u005B\u0042') { // down
         if (typedCommandsPointer >= typedCommands.length - 1) {
             process.stdout.clearLine();  // clear current text
@@ -32,6 +42,7 @@ const keyHandler = (commands, key) => {
             process.stdout.cursorTo(0);
             process.stdout.write(typedCommands[typedCommandsPointer]);
             buffer = typedCommands[typedCommandsPointer];
+            cursorPosition = (buffer.length - 1);
         }
     } else if (key == '\u001B\u005B\u0044') { // left
     } else if (key == '\u0003') { // cntrl + c
@@ -57,15 +68,23 @@ const keyHandler = (commands, key) => {
             let commandsList = [];
             for (let key in commands) {
                 if (!commands.hasOwnProperty(key)) continue;
-                commandsList.push(` ${commands[key].usage} \r\n`);
+                if (commands[key].usage) {
+                    commandsList.push(` ${commands[key].usage} \r\n`);
+                } else {
+                    commandsList.push(` Not declared help for command "${key}" in object key "usage"! \r\n`);
+                }
             }
             console.log(`${FILENAME}: Available commands are: \r\n${commandsList.join('') }`);
         } else {
             console.error(`${FILENAME}: Command not recognized! Use help command!`);
         }
     } else {
-        process.stdout.write(key);
-        buffer = buffer + key;
+        // require('fs').writeFileSync('key.txt', toUnicode(key)); return false;
+        if (/^[-\w\s\t'"\\/\[\]\.{},;<>|:?!@#%\^&\$*\(\)+=~`]+$/.test(key)) {
+           process.stdout.write(key);
+            buffer = buffer + key;
+            cursorPosition = (buffer.length - 1);
+        }
     }
 };
 
