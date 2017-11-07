@@ -1,8 +1,8 @@
 {
-  "name": "examples__js_console_command_executer",
+  "name": "examples__js_console_command_executor",
   "version": "1.0.0",
   "description": "",
-  "main": "console-command-executer.js",
+  "main": "console-command-executor.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,7 +17,6 @@
   },
   "homepage": "https://github.com/nedzelskiy/examples__js_console_command_executer#readme",
   "devDependencies": {
-    "ps-node": "^0.1.6",
     "shell-quote": "^1.6.1",
     "terminate": "^2.1.0"
   }
