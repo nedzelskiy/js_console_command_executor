@@ -25,12 +25,11 @@ const availableCommands = {
     'exit': {
         run: function() {
             const signal = 'SIGTERM';
+            console.log(`Command exit ${process.id} will be executed with signal [${signal}]!`);
             terminate(process.pid, 'SIGTERM', err => {
                 if (err) {
                     console.error(err);
-                } else {
-                    console.log(`Command exit ${process.id} executed with signal [${signal}]!`);
-                }
+                } 
             });
         }
     }

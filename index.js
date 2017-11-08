@@ -12,39 +12,52 @@ let typedCommandsPointer = -1;
 
 const keyHandler = (commands, key) => {
     if (key == '\u001B\u005B\u0041') { // up
-        if (typedCommandsPointer > 0) {
-            typedCommandsPointer--;
+        if (typedCommandsPointer >= 0) {
             process.stdout.clearLine();  // clear current text
             process.stdout.cursorTo(0);
             process.stdout.write(typedCommands[typedCommandsPointer]);
             buffer = typedCommands[typedCommandsPointer];
-            cursorPosition = (buffer.length - 1);
+            typedCommandsPointer--;
+            cursorPosition = buffer.length;
         } else {
             process.stdout.clearLine();  // clear current text
             process.stdout.cursorTo(0);
+            buffer = '';
+            cursorPosition = 0;
         }
     } else if (key == '\u0008') { //backspace
+        cursorPosition--;
         process.stdout.clearLine();
         process.stdout.cursorTo(0);
-        buffer = buffer.substring(0, cursorPosition);
+        let first = buffer.substring(0, cursorPosition);
+        let second = buffer.substring(cursorPosition + 1);
+        buffer = first + second;
         process.stdout.write(buffer);
-        cursorPosition = (buffer.length - 1) | 0;
-        // console.log("\r\n", cursorPosition, buffer, "\r\n");
-    } else if (key == '\u001B\u005B\u0043') { // right
-
+        process.stdout.cursorTo(cursorPosition);
     } else if (key == '\u001B\u005B\u0042') { // down
-        if (typedCommandsPointer >= typedCommands.length - 1) {
-            process.stdout.clearLine();  // clear current text
-            process.stdout.cursorTo(0);
-        } else {
+        if (typedCommandsPointer < typedCommands.length - 1) {
             typedCommandsPointer++;
             process.stdout.clearLine();  // clear current text
             process.stdout.cursorTo(0);
             process.stdout.write(typedCommands[typedCommandsPointer]);
             buffer = typedCommands[typedCommandsPointer];
-            cursorPosition = (buffer.length - 1);
+            cursorPosition = buffer.length;
+        } else {
+            process.stdout.clearLine();  // clear current text
+            process.stdout.cursorTo(0);
+            buffer = '';
+            cursorPosition = 0;
         }
     } else if (key == '\u001B\u005B\u0044') { // left
+        if (cursorPosition > 0) {
+            cursorPosition--;
+            process.stdout.cursorTo(cursorPosition);
+        }
+    } else if (key == '\u001B\u005B\u0043') { // right
+        if (cursorPosition < buffer.length) {
+            cursorPosition++;
+            process.stdout.cursorTo(cursorPosition);
+        }
     } else if (key == '\u0003') { // cntrl + c
         terminate(process.pid, 'SIGKILL', err => {
             if (err) {
@@ -57,8 +70,9 @@ const keyHandler = (commands, key) => {
         process.stdout.write('\r\n');
         const commandLine = buffer;
         buffer = '';
+        cursorPosition = 0;
         typedCommands.push(commandLine);
-        typedCommandsPointer = typedCommands.length;
+        typedCommandsPointer = typedCommands.length - 1;
         const commandChunks = parse(commandLine);
         const command = commandChunks[0];
 
@@ -76,14 +90,25 @@ const keyHandler = (commands, key) => {
             }
             console.log(`${FILENAME}: Available commands are: \r\n${commandsList.join('') }`);
         } else {
-            console.error(`${FILENAME}: Command not recognized! Use help command!`);
+            console.error(`${FILENAME}: Command "${commandLine}" not recognized! Use help command!`);
         }
     } else {
         // require('fs').writeFileSync('key.txt', toUnicode(key)); return false;
         if (/^[-\w\s\t'"\\/\[\]\.{},;<>|:?!@#%\^&\$*\(\)+=~`]+$/.test(key)) {
-           process.stdout.write(key);
-            buffer = buffer + key;
-            cursorPosition = (buffer.length - 1);
+            if (buffer.length !== cursorPosition) {
+                process.stdout.clearLine();
+                process.stdout.cursorTo(0);
+                let first = buffer.substring(0, cursorPosition );
+                let second = buffer.substring(cursorPosition);
+                buffer = first + key + second;
+                process.stdout.write(buffer);
+                cursorPosition++;
+                process.stdout.cursorTo(cursorPosition);
+            } else {
+                buffer = buffer + key;
+                cursorPosition = buffer.length;
+                process.stdout.write(key);
+            }
         }
     }
 };
