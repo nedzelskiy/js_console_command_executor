@@ -1,21 +1,21 @@
 {
-  "name": "examples__js_console_command_executor",
+  "name": "js_console_command_executor",
   "version": "1.0.0",
   "description": "this scripts will be waiting and execute commands you will give to it.",
-  "main": "console-command-executor.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nedzelskiy/examples__js_console_command_executor.git"
+    "url": "git+https://github.com/nedzelskiy/js_console_command_executor.git"
   },
   "author": "Pavel Nedzelskiy",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nedzelskiy/examples__js_console_command_executor/issues"
+    "url": "https://github.com/nedzelskiy/js_console_command_executor/issues"
   },
-  "homepage": "https://github.com/nedzelskiy/examples__js_console_command_executor#readme",
+  "homepage": "https://github.com/nedzelskiy/js_console_command_executor#readme",
   "maintainers": [
     {
       "name": "pavelnedzelskiy",
