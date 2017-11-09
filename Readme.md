@@ -29,7 +29,7 @@ availableCommands.exit.usage =  'exit                            stop watching f
 require script:
 
 ````bash
-const execConsole = require('./index')(availableCommands);
+const execConsole = require('js_console_command_executor')(availableCommands);
 ````
 Optionally you can add new key handler. Adding new handler for "Ctrl + q":
 ````bash
