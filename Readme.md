@@ -21,7 +21,7 @@ const availableCommands = {
     }
 };
 ````
-Add help for each commands, symbol "<>" needed as separator between command and text explanation for pretty input:
+Add help for each commands, symbol "<>" needed as separator between command and text explanation (for pretty input):
 ````javascript
 availableCommands.k.usage =     'k [PID, [SIGNAL]] <> kill process by its PID';
 availableCommands.exit.usage =  'exit <> stop watching for commands and exit script';
