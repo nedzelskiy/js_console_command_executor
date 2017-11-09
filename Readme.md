@@ -7,7 +7,7 @@ You can add any handlers for any keys and any commands for run as written below.
 
 First of all you need define your commands:
 
-````bash
+````javascript
 const availableCommands = {
     'k': {
         run: function() {
@@ -22,23 +22,23 @@ const availableCommands = {
 };
 ````
 Optionally you can add help for each commands:
-````bash
+````javascript
 availableCommands.k.usage =     'k [PID, [SIGNAL]]               kill process by its PID';
 availableCommands.exit.usage =  'exit                            stop watching for commands and exit script';
 ````
 require script:
 
-````bash
+````javascript
 const execConsole = require('js_console_command_executor')(availableCommands);
 ````
 Optionally you can add new key handler. Adding new handler for "Ctrl + q":
-````bash
+````javascript
 execConsole.keys['\u0011'] = (controls, commands) => {
     console.log('This is handler for Cntrl + q! Another exit action!');
 };
 ````
 And this we're adding action move cursor left for two position for key "{" => "Shift + [":
-````bash
+````javascript
 execConsole.keys['\u007B'] = (controls, commands) => {
     if (controls.cursorPosition > 1) {
         controls.cursorPosition = controls.cursorPosition - 2;
@@ -47,7 +47,7 @@ execConsole.keys['\u007B'] = (controls, commands) => {
 };
 ````
 Optionally you can rebind standard handler. Rebind logic for "combineActionsForEnterHandle":
-````bash
+````javascript
 execConsole.actions.combineActionsForEnterHandle = function() {
     console.log("\r\n\r\nThis is a logger! From rebind standard handler \"combineActionsForEnterHandle\"!");
     this.enterActionHandle(execConsole.controls);
@@ -56,11 +56,11 @@ execConsole.actions.combineActionsForEnterHandle = function() {
 ````
 
 run script:
-````bash
+````javascript
 execConsole();
 ````
 and you can even add a new command after script run (optional)!
-````bash
+````javascript
 execConsole.commands['n'] = {
     run: function() {
         console.log('I\'m a new command added after running script!');
