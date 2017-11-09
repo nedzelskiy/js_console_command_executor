@@ -10,13 +10,15 @@ First of all you need define your commands:
 ````javascript
 const availableCommands = {
     'k': {
-        run: function() {
-            console.log('kill process!');
+        run: function(pid, signal) {
+            console.log(`kill process! ${ pid } with signal "${ signal }"`);
+            // some logic
         }
     },
     'exit': {
         run: function() {
-            console.log('exit process!');
+            console.log(`exit process! ${ process.pid }`);
+            // some logic
         }
     }
 };
