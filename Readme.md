@@ -21,7 +21,7 @@ const availableCommands = {
     }
 };
 ````
-adding help for each commands
+Optionally you can add help for each commands:
 ````bash
 availableCommands.k.usage =     'k [PID, [SIGNAL]]               kill process by its PID';
 availableCommands.exit.usage =  'exit                            stop watching for commands and exit script';
@@ -31,13 +31,13 @@ require script:
 ````bash
 const execConsole = require('./index')(availableCommands);
 ````
-adding new key handler for  "Ctrl + q"
+Optionally you can add new key handler. Adding new handler for "Ctrl + q":
 ````bash
 execConsole.keys['\u0011'] = (controls, commands) => {
     console.log('This is handler for Cntrl + q! Another exit action!');
 };
 ````
-adding action move cursor left for two position for key "{" => "Shift + ["
+And this we're adding action move cursor left for two position for key "{" => "Shift + [":
 ````bash
 execConsole.keys['\u007B'] = (controls, commands) => {
     if (controls.cursorPosition > 1) {
@@ -46,7 +46,7 @@ execConsole.keys['\u007B'] = (controls, commands) => {
     }
 };
 ````
-rebind standard handler "combineActionsForEnterHandle"
+Optionally you can rebind standard handler. Rebind logic for "combineActionsForEnterHandle":
 ````bash
 execConsole.actions.combineActionsForEnterHandle = function() {
     console.log("\r\n\r\nThis is a logger! From rebind standard handler \"combineActionsForEnterHandle\"!");
@@ -55,11 +55,11 @@ execConsole.actions.combineActionsForEnterHandle = function() {
 };
 ````
 
-run script
+run script:
 ````bash
 execConsole();
 ````
-and even add a new command after script run!
+and you can even add a new command after script run (optional)!
 ````bash
 execConsole.commands['n'] = {
     run: function() {
