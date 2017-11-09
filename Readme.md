@@ -78,7 +78,7 @@ execConsole.commands['n'] = {
 
 ````
 
-Try use it! For more example run:
+Try use it! For demo run:
 ````bash
 node ./example_runing.js
 ````
