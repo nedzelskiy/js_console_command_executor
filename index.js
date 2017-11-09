@@ -91,10 +91,23 @@ const actions = {
             commands[command].run(...commandChunks.slice(1));
         } else if ('help' === command) {
             let commandsList = [];
+            let maxLongString = 0;
+            for (let key in commands) {
+                if (!commands.hasOwnProperty(key)) continue;
+                let strLine = commands[key].usage.split("<>");
+                if (strLine[0].length > maxLongString) {
+                    maxLongString = strLine[0].length;
+                }
+            }
             for (let key in commands) {
                 if (!commands.hasOwnProperty(key)) continue;
                 if (commands[key].usage) {
-                    commandsList.push(` ${commands[key].usage} \r\n`);
+                    let strLine = commands[key].usage.split('<>');
+                    let textLine = strLine[0] + ' '.repeat(maxLongString - strLine[0].length) + ' '.repeat(3);
+                    if (strLine[1] && '' !== strLine[1]) {
+                        textLine = textLine + strLine[1];
+                    }
+                    commandsList.push(` ${textLine} \r\n`);
                 } else {
                     commandsList.push(` Not declared help for command "${key}" in object key "usage"! \r\n`);
                 }

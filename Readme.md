@@ -21,10 +21,10 @@ const availableCommands = {
     }
 };
 ````
-Optionally you can add help for each commands:
+Add help for each commands, symbol "<>" needed as separator between command and text explanation for pretty input:
 ````javascript
-availableCommands.k.usage =     'k [PID, [SIGNAL]]               kill process by its PID';
-availableCommands.exit.usage =  'exit                            stop watching for commands and exit script';
+availableCommands.k.usage =     'k [PID, [SIGNAL]] <> kill process by its PID';
+availableCommands.exit.usage =  'exit <> stop watching for commands and exit script';
 ````
 require script:
 
@@ -65,7 +65,7 @@ execConsole.commands['n'] = {
     run: function() {
         console.log('I\'m a new command added after running script!');
     },
-    usage: 'n                               just a new added command!'
+    usage: 'n <> just a new added command!'
 };
 
 ````
