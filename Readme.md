@@ -34,10 +34,10 @@ const execConsole = require('js_console_command_executor')(availableCommands);
 ````
 **Now you can access for this objects:**
 ````javascript
-* execConsole.keys		// objects with defined keys and handlers;
-* execConsole.actions	// object with all standard functions such as executeCommand and etc;
-* execConsole.commands 	// your object with commands;
-* execConsole.controls	// object with state of line buffer, cursor position etc;
+* execConsole.keys      // objects with defined keys and handlers;
+* execConsole.actions   // object with all standard functions such as executeCommand and etc;
+* execConsole.commands  // your object with commands;
+* execConsole.controls  // object with state of line buffer, cursor position etc;
 ````
 Optionally you can add new key handler. Adding new handler for "Ctrl + q":
 ````javascript
