@@ -107,7 +107,7 @@ const actions = {
     },
     testKeyForAvailableToStdout: function (key) {
         // require('fs').writeFileSync('key.txt', actions.toUnicode(key)); return false;
-        return /^[-\w\s\t'"\\/\[\]\.{},;<>|:?!@#%\^&\$*\(\)+=~`]+$/.test(key);
+        return /^[-\w\s'"\\/\[\]\.{},;<>|:?!@#%\^&\$*\(\)+=~`]+$/.test(key);
     },
     writeSymbolIntoStdout: function (controls, key) {
         if (actions.testKeyForAvailableToStdout()) {
