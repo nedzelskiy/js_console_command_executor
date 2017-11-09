@@ -31,13 +31,13 @@ require script:
 ````bash
 const execConsole = require('./index')(availableCommands);
 ````
-adding new key "Cntr + q"
+adding new key handler for  "Ctrl + q"
 ````bash
 execConsole.keys['\u0011'] = (controls, commands) => {
     console.log('This is handler for Cntrl + q! Another exit action!');
 };
 ````
-adding action move cursor left for two position for key "{"
+adding action move cursor left for two position for key "{" => "Shift + ["
 ````bash
 execConsole.keys['\u007B'] = (controls, commands) => {
     if (controls.cursorPosition > 1) {

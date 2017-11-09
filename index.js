@@ -170,7 +170,7 @@ consoleCommander.actions = actions;
 consoleCommander.controls = controls;
 
 
-consoleCommander.keys['\u0003'] = () => actions.doExit(); // cntrl + c
+consoleCommander.keys['\u0003'] = () => actions.doExit(); // Ctrl + C
 consoleCommander.keys['\u0008'] = (controls) => actions.backSpaceActionHandle(controls); // backspace
 consoleCommander.keys['\u000D'] = (controls) => actions.combineActionsForEnterHandle(controls); // enter
 consoleCommander.keys['\u001B\u005B\u0041'] = (controls) => actions.upCursorActionHandle(controls); // up
