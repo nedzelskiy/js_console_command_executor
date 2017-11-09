@@ -183,13 +183,13 @@ consoleCommander.actions = actions;
 consoleCommander.controls = controls;
 
 
-consoleCommander.keys['\u0003'] = () => actions.doExit(); // Ctrl + C
-consoleCommander.keys['\u0008'] = (controls) => actions.backSpaceActionHandle(controls); // backspace
-consoleCommander.keys['\u000D'] = (controls) => actions.combineActionsForEnterHandle(controls); // enter
-consoleCommander.keys['\u001B\u005B\u0041'] = (controls) => actions.upCursorActionHandle(controls); // up
-consoleCommander.keys['\u001B\u005B\u0042'] = (controls) => actions.downCursorActionHandle(controls); // down
-consoleCommander.keys['\u001B\u005B\u0044'] = (controls) => actions.leftCursorActionHandle(controls); // left
-consoleCommander.keys['\u001B\u005B\u0043'] = (controls) => actions.rightCursorActionHandle(controls); // right
+consoleCommander.keys['\u0003'] = (controls, commands) => actions.doExit(); // Ctrl + C
+consoleCommander.keys['\u0008'] = (controls, commands) => actions.backSpaceActionHandle(controls); // backspace
+consoleCommander.keys['\u000D'] = (controls, commands) => actions.combineActionsForEnterHandle(controls, commands); // enter
+consoleCommander.keys['\u001B\u005B\u0041'] = (controls, commands) => actions.upCursorActionHandle(controls); // up
+consoleCommander.keys['\u001B\u005B\u0042'] = (controls, commands) => actions.downCursorActionHandle(controls); // down
+consoleCommander.keys['\u001B\u005B\u0044'] = (controls, commands) => actions.leftCursorActionHandle(controls); // left
+consoleCommander.keys['\u001B\u005B\u0043'] = (controls, commands) => actions.rightCursorActionHandle(controls); // right
 
 module.exports = (commands) => {
     consoleCommander.commands = commands;
