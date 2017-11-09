@@ -42,7 +42,7 @@ const execConsole = require('js_console_command_executor')(availableCommands);
 Optionally you can add new key handler. Adding new handler for "Ctrl + q":
 ````javascript
 execConsole.keys['\u0011'] = (controls, commands) => {
-    console.log('This is handler for Cntrl + q! Another exit action!');
+    console.log('This is handler for Ctrl + q! Another exit action!');
 };
 ````
 And this we're adding action move cursor left for two position for key "{" => "Shift + [":
