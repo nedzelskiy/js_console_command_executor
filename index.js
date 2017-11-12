@@ -1,11 +1,12 @@
 'use strict';
 
-const stdin = process.stdin;
 const terminate = require('terminate');
 const parse = require('shell-quote').parse;
 const FILENAME = `js-console-command-executor: pid[${ process.pid }]`;
 
 const controls = {
+    stdin: process.stdin,
+    stdout: process.stdout,
     buffer: '',
     commandLine: '',
     cursorPosition: 0,
@@ -26,20 +27,20 @@ const actions = {
     moveCursorToRight: function (controls, commands) {
         if (controls.cursorPosition < controls.buffer.length) {
             controls.cursorPosition++;
-            process.stdout.cursorTo(controls.cursorPosition);
+            controls.stdout.cursorTo(controls.cursorPosition);
         }
     },
     moveCursorToLeft: function (controls, commands) {
         if (controls.cursorPosition > 0) {
             controls.cursorPosition--;
-            process.stdout.cursorTo(controls.cursorPosition);
+            controls.stdout.cursorTo(controls.cursorPosition);
         }
     },
     goUpToCommandsHistory: function (controls, commands) {
         if (controls.typedCommandsPointer >= 0) {
-            process.stdout.clearLine();  // clear current text
-            process.stdout.cursorTo(0);
-            process.stdout.write(controls.typedCommands[controls.typedCommandsPointer]);
+            controls.stdout.clearLine();  // clear current text
+            controls.stdout.cursorTo(0);
+            controls.stdout.write(controls.typedCommands[controls.typedCommandsPointer]);
             controls.buffer = controls.typedCommands[controls.typedCommandsPointer];
             controls.typedCommandsPointer--;
             controls.cursorPosition = controls.buffer.length;
@@ -50,9 +51,9 @@ const actions = {
     goDownToCommandsHistory: function (controls, commands) {
         if (controls.typedCommandsPointer < controls.typedCommands.length - 1) {
             controls.typedCommandsPointer++;
-            process.stdout.clearLine();  // clear current text
-            process.stdout.cursorTo(0);
-            process.stdout.write(controls.typedCommands[controls.typedCommandsPointer]);
+            controls.stdout.clearLine();  // clear current text
+            controls.stdout.cursorTo(0);
+            controls.stdout.write(controls.typedCommands[controls.typedCommandsPointer]);
             controls.buffer = controls.typedCommands[controls.typedCommandsPointer];
             controls.cursorPosition = controls.buffer.length;
         } else {
@@ -60,7 +61,7 @@ const actions = {
         }
     },
     handleEnterKeyAction: function (controls) {
-        process.stdout.write('\r\n');
+        controls.stdout.write('\r\n');
         controls.commandLine = controls.buffer.trim().replace(/[\s\t]+/g, ' ');
         controls.buffer = '';
         controls.cursorPosition = 0;
@@ -69,13 +70,13 @@ const actions = {
     },
     handleBackSpaceKeyAction: function (controls, commands) {
         controls.cursorPosition--;
-        process.stdout.clearLine();
-        process.stdout.cursorTo(0);
+        controls.stdout.clearLine();
+        controls.stdout.cursorTo(0);
         let first = controls.buffer.substring(0, controls.cursorPosition);
         let second = controls.buffer.substring(controls.cursorPosition + 1);
         controls.buffer = first + second;
-        process.stdout.write(controls.buffer);
-        process.stdout.cursorTo(controls.cursorPosition);
+        controls.stdout.write(controls.buffer);
+        controls.stdout.cursorTo(controls.cursorPosition);
     },
     handleHelpCommand: function(controls, commands) {
         let commandsList = [];
@@ -100,7 +101,7 @@ const actions = {
                 commandsList.push(` Not declared help for command "${key}" in object key "usage"! \r\n`);
             }
         }
-        console.log(`${FILENAME}: Available commands are: \r\n\r\n${commandsList.join('') }`);
+        controls.stdout.write(`${FILENAME}: Available commands are: \r\n\r\n${commandsList.join('') }` + "\r\n");
     },
     executeCommand: function (controls, commands) {
         const commandChunks = parse(controls.commandLine);
@@ -122,18 +123,18 @@ const actions = {
     writeSymbolToStdout: function (controls, key) {
         if (actions.testKeyForAvailableToStdout(key)) {
             if (controls.buffer.length !== controls.cursorPosition) {
-                process.stdout.clearLine();
-                process.stdout.cursorTo(0);
+                controls.stdout.clearLine();
+                controls.stdout.cursorTo(0);
                 let first = controls.buffer.substring(0, controls.cursorPosition );
                 let second = controls.buffer.substring(controls.cursorPosition);
                 controls.buffer = first + key + second;
-                process.stdout.write(controls.buffer);
+                controls.stdout.write(controls.buffer);
                 controls.cursorPosition++;
-                process.stdout.cursorTo(controls.cursorPosition);
+                controls.stdout.cursorTo(controls.cursorPosition);
             } else {
                 controls.buffer = controls.buffer + key;
                 controls.cursorPosition = controls.buffer.length;
-                process.stdout.write(key);
+                controls.stdout.write(key);
             }
         }
     },
@@ -162,8 +163,8 @@ const actions = {
         }
     },
     clearStdOut: function(controls, commands) {
-        process.stdout.clearLine();
-        process.stdout.cursorTo(0);
+        controls.stdout.clearLine();
+        controls.stdout.cursorTo(0);
         controls.buffer = '';
         controls.cursorPosition = 0;
     }
@@ -172,13 +173,13 @@ const actions = {
 
 
 let execConsole = function() {
-    stdin.setRawMode(true);
-    stdin.resume();
-    stdin.setEncoding('utf8');
-    stdin.on('data', (key) => {
+    controls.stdin.setRawMode(true);
+    controls.stdin.resume();
+    controls.stdin.setEncoding('utf8');
+    controls.stdin.on('data', (key) => {
         actions.keyHandler(key, execConsole.keys, execConsole.commands, execConsole.controls);
     });
-    console.log(`${FILENAME}: watching for commands! type help for list of commands!`);
+    controls.stdout.write(`${FILENAME}: watching for commands! type help for list of commands!` + "\r\n");
 };
 execConsole.keys = {};
 execConsole.commands = {};

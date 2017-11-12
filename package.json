@@ -4,7 +4,8 @@
   "description": "this scripts will be waiting and execute commands you will give to it.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node node_modules/jasmine/bin/jasmine.js tests.js",
+    "demo": "node example_runing.js"
   },
   "repository": {
     "type": "git",
@@ -25,5 +26,10 @@
   "dependencies": {
     "shell-quote": "^1.6.1",
     "terminate": "^2.1.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "intercept-stdout": "^0.1.2",
+    "jasmine": "^2.8.0"
   }
 }
