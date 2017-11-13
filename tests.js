@@ -2,8 +2,9 @@
 
 const availableCommands = {};
 const { expect, assert } = require('chai');
-const exec = require('child_process').exec;
+const EventEmitter = require('events');
 const execConsole = require('./index.js')(availableCommands);
+
 let stdoutMock = {
     buffer: '',
     write: function(data) {
@@ -12,11 +13,21 @@ let stdoutMock = {
     clearLine: function() {
         this.buffer = '';
     },
-    cursorTo: function() {
-
-    }
+    cursorTo: function() {}
 };
+
+let stdinMock = new EventEmitter();
+
+stdinMock.setRawMode = function(bool) {
+    return bool;
+};
+stdinMock.resume = function() {};
+stdinMock.setEncoding = function(str) {
+    return str;
+};
+
 execConsole.controls.stdout = stdoutMock;
+execConsole.controls.stdin = stdinMock;
 execConsole();
 
 describe('JS console command executor', () => {
@@ -30,9 +41,29 @@ describe('JS console command executor', () => {
         execConsole.controls.typedCommandsPointer = -1;
     });
 
-    it('should allows write chars at any case', next => {
+    it('should allows write to stdout space and keyboards chars with both register', next => {
         let testKey = execConsole.actions.testKeyForAvailableToStdout;
-        assert.isTrue(testKey('a'));
+        for (let i = 32; i < 127; i++) {
+            if (!testKey(String.fromCharCode(i))) {
+                console.log(i, String.fromCharCode(i), 'allowed to stdout = false');
+            }
+            assert.isTrue(testKey(String.fromCharCode(i)));
+        }
+        next();
+    });
+    it('should deny write to stdout special symbols expect declared in object keys', next => {
+        let testKey = execConsole.actions.testKeyForAvailableToStdout;
+        let toUnicode = execConsole.actions.toUnicode;
+        for (let i = 0; i < 32; i++) {
+            for (let key in execConsole.keys) {
+                if (!execConsole.keys.hasOwnProperty(key)) continue;
+                if (String.fromCharCode(i) === key) continue;
+                if (testKey(String.fromCharCode(i))) {
+                    console.log(i, String.fromCharCode(i), 'allowed to stdout = true');
+                }
+            }
+            assert.isFalse(testKey(String.fromCharCode(i)));
+        }
         next();
     });
     it('should right handle backspace key', next => {
@@ -65,6 +96,12 @@ describe('JS console command executor', () => {
         execConsole.controls.cursorPosition = execConsole.controls.buffer.length;
         execConsole.actions.moveCursorToRight(execConsole.controls, execConsole.commands);
         expect(execConsole.controls.cursorPosition).to.be.equal(execConsole.controls.buffer.length);
+        next();
+    });
+    it('should shows previous command after pressed up arrow', next => {
+        stdinMock.emit('data', 'd');
+        console.log(stdoutMock.buffer);
+        // goUpToCommandsHistory
         next();
     });
 });

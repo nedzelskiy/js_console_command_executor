@@ -3,6 +3,7 @@
 const terminate = require('terminate');
 const parse = require('shell-quote').parse;
 const FILENAME = `js-console-command-executor: pid[${ process.pid }]`;
+const IS_WINDOWS = /^win/.test(process.platform);
 
 const controls = {
     stdin: process.stdin,
@@ -15,7 +16,7 @@ const controls = {
 };
 
 const actions = {
-    doExit: function (controls, commands) {
+    doExit: function (controls, commands, key) {
         terminate(process.pid, 'SIGKILL', err => {
             if (err) {
                 console.error(`${FILENAME} ERROR: `, err);
@@ -24,19 +25,19 @@ const actions = {
             }
         });
     },
-    moveCursorToRight: function (controls, commands) {
+    moveCursorToRight: function (controls, commands, key) {
         if (controls.cursorPosition < controls.buffer.length) {
             controls.cursorPosition++;
             controls.stdout.cursorTo(controls.cursorPosition);
         }
     },
-    moveCursorToLeft: function (controls, commands) {
+    moveCursorToLeft: function (controls, commands, key) {
         if (controls.cursorPosition > 0) {
             controls.cursorPosition--;
             controls.stdout.cursorTo(controls.cursorPosition);
         }
     },
-    goUpToCommandsHistory: function (controls, commands) {
+    goUpToCommandsHistory: function (controls, commands, key) {
         if (controls.typedCommandsPointer >= 0) {
             controls.stdout.clearLine();  // clear current text
             controls.stdout.cursorTo(0);
@@ -48,7 +49,7 @@ const actions = {
             actions.clearStdOut(controls, commands);
         }
     },
-    goDownToCommandsHistory: function (controls, commands) {
+    goDownToCommandsHistory: function (controls, commands, key) {
         if (controls.typedCommandsPointer < controls.typedCommands.length - 1) {
             controls.typedCommandsPointer++;
             controls.stdout.clearLine();  // clear current text
@@ -60,7 +61,7 @@ const actions = {
             actions.clearStdOut(controls, commands);
         }
     },
-    handleEnterKeyAction: function (controls) {
+    handleEnterKeyAction: function (controls, commands, key) {
         controls.stdout.write('\r\n');
         controls.commandLine = controls.buffer.trim().replace(/[\s\t]+/g, ' ');
         controls.buffer = '';
@@ -68,7 +69,7 @@ const actions = {
         controls.typedCommands.push(controls.commandLine);
         controls.typedCommandsPointer = controls.typedCommands.length - 1;
     },
-    handleBackSpaceKeyAction: function (controls, commands) {
+    handleBackSpaceKeyAction: function (controls, commands, key) {
         controls.cursorPosition--;
         controls.stdout.clearLine();
         controls.stdout.cursorTo(0);
@@ -78,7 +79,7 @@ const actions = {
         controls.stdout.write(controls.buffer);
         controls.stdout.cursorTo(controls.cursorPosition);
     },
-    handleHelpCommand: function(controls, commands) {
+    handleHelpCommand: function(controls, commands, key) {
         let commandsList = [];
         let maxLongString = 0;
         for (let key in commands) {
@@ -103,7 +104,7 @@ const actions = {
         }
         controls.stdout.write(`${FILENAME}: Available commands are: \r\n\r\n${commandsList.join('') }` + "\r\n");
     },
-    executeCommand: function (controls, commands) {
+    executeCommand: function (controls, commands, key) {
         const commandChunks = parse(controls.commandLine);
         const command = commandChunks[0];
 
@@ -117,10 +118,13 @@ const actions = {
         controls.commandLine = '';
     },
     testKeyForAvailableToStdout: function (key) {
-        // require('fs').writeFileSync('key.txt', actions.toUnicode(key)); return false;
-        return /^[-\w\s'"\\/\[\]\.{},;<>|:?!@#%\^&\$*\(\)+=~`]+$/.test(key);
+        // require('fs').writeFileSync('key.txt', actions.toUnicode(key));
+        return (
+            /^[-\w'"\\/\[\]\.{},;<>|:?!@#%\^&\$*\(\)+=~`]+$/.test(key)
+            || '\u0020' === key // space
+        );
     },
-    writeSymbolToStdout: function (controls, key) {
+    writeSymbolToStdout: function (controls, commands, key) {
         if (actions.testKeyForAvailableToStdout(key)) {
             if (controls.buffer.length !== controls.cursorPosition) {
                 controls.stdout.clearLine();
@@ -157,12 +161,12 @@ const actions = {
     keyHandler: function (key, keys, commands, controls) {
         // console.log(actions.toUnicode(key));
         if (keys[key] && typeof keys[key] === 'function') {
-            keys[key](controls, commands);
+            keys[key](controls, commands, key);
         } else {
-            actions.writeSymbolToStdout(controls, key);
+            actions.writeSymbolToStdout(controls, commands, key);
         }
     },
-    clearStdOut: function(controls, commands) {
+    clearStdOut: function(controls, commands, key) {
         controls.stdout.clearLine();
         controls.stdout.cursorTo(0);
         controls.buffer = '';
@@ -187,14 +191,18 @@ execConsole.actions = actions;
 execConsole.controls = controls;
 
 
-execConsole.keys['\u0003'] = (controls, commands) => actions.doExit(controls, commands); // Ctrl + C
-execConsole.keys['\u001B'] = (controls, commands) => actions.clearStdOut(controls, commands); // Esc
-execConsole.keys['\u007F'] = (controls, commands) => actions.handleBackSpaceKeyAction(controls); // backspace
-execConsole.keys['\u000D'] = (controls, commands) => actions.handleCombineActionsForEnterKeyAction(controls, commands); // enter
-execConsole.keys['\u001B\u005B\u0041'] = (controls, commands) => actions.goUpToCommandsHistory(controls); // up
-execConsole.keys['\u001B\u005B\u0042'] = (controls, commands) => actions.goDownToCommandsHistory(controls); // down
-execConsole.keys['\u001B\u005B\u0044'] = (controls, commands) => actions.moveCursorToLeft(controls); // left
-execConsole.keys['\u001B\u005B\u0043'] = (controls, commands) => actions.moveCursorToRight(controls); // right
+execConsole.keys['\u0003'] = (controls, commands, key) => actions.doExit(controls, commands, key); // Ctrl + C
+execConsole.keys['\u001B'] = (controls, commands, key) => actions.clearStdOut(controls, commands, key); // Esc
+if (IS_WINDOWS) {
+    execConsole.keys['\u0008'] = (controls, commands, key) => actions.handleBackSpaceKeyAction(controls, commands, key); // backspace
+} else {
+    execConsole.keys['\u007F'] = (controls, commands, key) => actions.handleBackSpaceKeyAction(controls, commands, key); // backspace
+}
+execConsole.keys['\u000D'] = (controls, commands, key) => actions.handleCombineActionsForEnterKeyAction(controls, commands, key); // enter
+execConsole.keys['\u001B\u005B\u0041'] = (controls, commands, key) => actions.goUpToCommandsHistory(controls, commands, key); // up
+execConsole.keys['\u001B\u005B\u0042'] = (controls, commands, key) => actions.goDownToCommandsHistory(controls, commands, key); // down
+execConsole.keys['\u001B\u005B\u0044'] = (controls, commands, key) => actions.moveCursorToLeft(controls, commands, key); // left
+execConsole.keys['\u001B\u005B\u0043'] = (controls, commands, key) => actions.moveCursorToRight(controls, commands,key); // right
 
 module.exports = (commands) => {
     execConsole.commands = commands;
