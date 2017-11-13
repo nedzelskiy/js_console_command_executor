@@ -19,9 +19,7 @@ const actions = {
     doExit: function (controls, commands, key) {
         terminate(process.pid, 'SIGKILL', err => {
             if (err) {
-                console.error(`${FILENAME} ERROR: `, err);
-            } else {
-                process.exit();
+                controls.stdout.write(`${FILENAME} ERROR: ` + "\r\n" + err + "\r\n");
             }
         });
     },
@@ -46,19 +44,19 @@ const actions = {
             controls.typedCommandsPointer--;
             controls.cursorPosition = controls.buffer.length;
         } else {
-            actions.clearStdOut(controls, commands);
+            actions.clearStdOut(controls, commands, key);
         }
     },
     goDownToCommandsHistory: function (controls, commands, key) {
         if (controls.typedCommandsPointer < controls.typedCommands.length - 1) {
             controls.typedCommandsPointer++;
-            controls.stdout.clearLine();  // clear current text
+            controls.stdout.clearLine();
             controls.stdout.cursorTo(0);
             controls.stdout.write(controls.typedCommands[controls.typedCommandsPointer]);
             controls.buffer = controls.typedCommands[controls.typedCommandsPointer];
             controls.cursorPosition = controls.buffer.length;
         } else {
-            actions.clearStdOut(controls, commands);
+            actions.clearStdOut(controls, commands, key);
         }
     },
     handleEnterKeyAction: function (controls, commands, key) {
@@ -83,14 +81,14 @@ const actions = {
         let commandsList = [];
         let maxLongString = 0;
         for (let key in commands) {
-            if (!commands.hasOwnProperty(key)) continue;
-            let strLine = commands[key].usage.split("<>");
-            if (strLine[0].length > maxLongString) {
-                maxLongString = strLine[0].length;
+            if (commands[key].usage) {
+                let strLine = commands[key].usage.split("<>");
+                if (strLine[0].length > maxLongString) {
+                    maxLongString = strLine[0].length;
+                }
             }
         }
         for (let key in commands) {
-            if (!commands.hasOwnProperty(key)) continue;
             if (commands[key].usage) {
                 let strLine = commands[key].usage.split('<>');
                 let textLine = strLine[0] + ' '.repeat(maxLongString - strLine[0].length) + ' '.repeat(3);
@@ -113,7 +111,7 @@ const actions = {
         } else if ('help' === command) {
             actions.handleHelpCommand(controls, commands);
         } else {
-            console.error(`${FILENAME}: Command "${controls.commandLine}" not recognized! Use help command!`);
+            controls.stdout.write(`${FILENAME}: Command "${controls.commandLine}" not recognized! Use help command!` + "\r\n");
         }
         controls.commandLine = '';
     },
@@ -142,9 +140,9 @@ const actions = {
             }
         }
     },
-    handleCombineActionsForEnterKeyAction: function(controls, commands) {
-        actions.handleEnterKeyAction(controls);
-        actions.executeCommand(controls, commands);
+    handleCombineActionsForEnterKeyAction: function(controls, commands, key) {
+        actions.handleEnterKeyAction(controls, commands, key);
+        actions.executeCommand(controls, commands, key);
     },
     toUnicode: function (theString) {
         let unicodeString = '';
@@ -205,6 +203,14 @@ execConsole.keys['\u001B\u005B\u0044'] = (controls, commands, key) => actions.mo
 execConsole.keys['\u001B\u005B\u0043'] = (controls, commands, key) => actions.moveCursorToRight(controls, commands,key); // right
 
 module.exports = (commands) => {
-    execConsole.commands = commands;
-    return execConsole;
+    let isExistCommand = false;
+    for (let command in commands) {
+        isExistCommand = true;
+    }
+    if (!isExistCommand) {
+        console.log(`${FILENAME}: Object of given commands is empty!`); actions.doExit(); return {};
+    } else {
+        execConsole.commands = commands;
+        return execConsole;
+    }
 };
