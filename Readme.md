@@ -3,6 +3,12 @@
 This is a script that allows you wrote command and execute it while this script will be listening stdin!
 You can add any handlers for any keys and any commands for run as written below. Enjoy!
 
+### Install:
+
+````bash
+npm i --save-dev js_console_command_executor
+````
+
 ### Usage:
 
 First of all you need define your commands:
@@ -80,7 +86,12 @@ execConsole.commands['n'] = {
 
 ````
 
-Try use it! For demo run:
+Try use it! 
+For demo run:
 ````bash
-node ./example_runing.js
+npm run demo
+````
+For tests run:
+````bash
+npm run test
 ````

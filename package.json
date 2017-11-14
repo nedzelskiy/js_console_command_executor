@@ -1,6 +1,6 @@
 {
   "name": "js_console_command_executor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "this scripts will be waiting and execute commands you will give to it.",
   "main": "index.js",
   "scripts": {
