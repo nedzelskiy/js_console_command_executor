@@ -107,7 +107,7 @@ const actions = {
         const command = commandChunks[0];
 
         if (commands[command]) {
-            commands[command].run(...commandChunks.slice(1));
+            commands[command].run.apply(this, commandChunks.slice(1));
         } else if ('help' === command) {
             actions.handleHelpCommand(controls, commands);
         } else {

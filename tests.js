@@ -19,9 +19,10 @@ const availableCommands = {
 
 const sinon = require('sinon');
 const EventEmitter = require('events');
-const { expect, assert  } = require('chai');
+const chai = require('chai');
 const IS_WINDOWS = /^win/.test(process.platform);
-
+const expect = chai.expect;
+const assert = chai.assert;
 const execConsole = require('./index.js')(availableCommands);
 
 let stdoutMock = {
@@ -355,11 +356,6 @@ describe('JS console command executor', () => {
         stdinMock.emit('data', '5');
         stdinMock.emit('data', '\u000D'); // emulate pressed enter
         expect(stdoutMock.buffer).to.be.equal('345');
-        next();
-    });
-    it('should has exit from script', next => {
-        stdinMock.emit('data', '\u0003'); // emulate pressed Ctrl + C
-        expect(doExit_SPY.callCount).to.be.equal(1);
         next();
     });
 });
