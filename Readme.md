@@ -1,3 +1,5 @@
+[![Travis Build Status](https://api.travis-ci.org/nedzelskiy/js_console_command_executor.svg?branch=master)](https://travis-ci.org/nedzelskiy/js_console_command_executor)
+
 ### Review:
 
 This is a script that allows you wrote command and execute it while this script will be listening stdin!
