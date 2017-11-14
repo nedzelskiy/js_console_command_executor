@@ -8,6 +8,15 @@
     "coverage": "node node_modules/istanbul/lib/cli.js cover ./node_modules/jasmine/bin/jasmine.js tests.js",
     "demo": "node example_runing.js"
   },
+  "keywords": [
+    "javascript",
+    "js",
+    "console",
+    "executor",
+    "command",
+    "bash",
+    "sh"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nedzelskiy/js_console_command_executor.git"
