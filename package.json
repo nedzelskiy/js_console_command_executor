@@ -1,6 +1,6 @@
 {
-  "name": "js_console_command_executor",
-  "version": "1.0.4",
+  "name": "js-console-command-executor",
+  "version": "1.0.5",
   "description": "this scripts will be waiting and execute commands you will give to it.",
   "main": "index.js",
   "scripts": {
@@ -11,6 +11,8 @@
   "keywords": [
     "javascript",
     "js",
+    "js console",
+    "javascript console",
     "console",
     "executor",
     "command",

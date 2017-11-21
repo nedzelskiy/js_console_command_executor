@@ -27,14 +27,14 @@ let stdoutMock = {
     buffer: '',
     write: function(data) {
         if (!!~data.indexOf('\r') || !!~data.indexOf('\n')) {
-            this.buffer = '';
+            stdoutMock.buffer = '';
         } else {
-            this.buffer = this.buffer + data;
+            stdoutMock.buffer = stdoutMock.buffer + data;
         }
-        this.rawBuffer = this.rawBuffer + data;
+        stdoutMock.rawBuffer = stdoutMock.rawBuffer + data;
     },
     clearLine: function() {
-        this.buffer = '';
+        stdoutMock.buffer = '';
     },
     cursorTo: function() {}
 };
@@ -148,10 +148,17 @@ describe('JS console command executor', () => {
         expect(stdoutMock.rawBuffer).to.be.equal('');
 
         stdoutMock.clearLine();
+        execConsole.controls.buffer = '';
         stdinMock.emit('data', 'rt/');
-        execConsole.controls.buffer = 'rt/';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
         expect(stdoutMock.buffer).to.be.equal('rt/');
+
+        stdoutMock.rawBuffer = '';
+        execConsole.controls.cursorPosition = 0;
+        execConsole.controls.buffer = '';
+        stdinMock.emit('data', 'gggg');
+        stdinMock.emit('data', '\u0009'); // emulated tab key action
+        expect(stdoutMock.rawBuffer).to.be.equal('gggg');
 
         next();
     });
