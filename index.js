@@ -1,9 +1,11 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const terminate = require('terminate');
 const parse = require('shell-quote').parse;
-const FILENAME = `js-console-command-executor: pid[${ process.pid }]`;
 const IS_WINDOWS = /^win/.test(process.platform);
+const FILENAME = `js-console-command-executor: pid[${ process.pid }]`;
 
 const controls = {
     stdin: process.stdin,
@@ -68,6 +70,10 @@ const actions = {
         controls.typedCommandsPointer = controls.typedCommands.length - 1;
     },
     handleBackSpaceKeyAction: function (controls, commands, key) {
+        if (controls.cursorPosition < 1) {
+            controls.cursorPosition = 0;
+            return;
+        }
         controls.cursorPosition--;
         controls.stdout.clearLine();
         controls.stdout.cursorTo(0);
@@ -169,6 +175,74 @@ const actions = {
         controls.stdout.cursorTo(0);
         controls.buffer = '';
         controls.cursorPosition = 0;
+    },
+    searchFolderByStdin: function(controls, commands, key) {
+        // if last buffer symbol isn't space or tab
+        if (/[\s\t]+/.test(controls.buffer[controls.buffer.length - 1])) {
+            return;
+        }
+        let matched = []
+            ,parsedBuffer = parse(controls.buffer)
+            ;
+        if (parsedBuffer.length < 1) return;
+
+        let folders = parsedBuffer.pop().split('/');
+
+        if (folders[folders.length - 1] === '') { // do list of all folders in way
+            let foldersWay = folders[0];
+
+            for (let i = 1; i < folders.length - 1; i++) {
+                foldersWay = foldersWay + `/${folders[i]}`;
+            }
+
+            let way = path.normalize(`${process.env.pwd}/${foldersWay}`);
+
+            if (!fs.existsSync(way)) return;
+
+            actions.putInfoInStdOut( fs.readdirSync(way).join(' '));
+            controls.stdout.write(controls.buffer);
+            controls.cursorPosition = controls.buffer.length;
+        } else {
+            let folderName = folders[folders.length - 1]
+                ,foldersWay = ''
+                ;
+
+            for (let i = 0; i < folders.length - 1; i++) {
+                foldersWay = foldersWay + `/${folders[i]}`;
+            }
+            let way = path.normalize(`${process.env.pwd}/${foldersWay}`);
+
+            if (!fs.existsSync(way)) return;
+
+            const folderContent = fs.readdirSync(way);
+            folderContent.forEach(name => {
+                let regex = new RegExp(`^${folderName}`, "i");
+                if (regex.test(name)) {
+                    if (fs.lstatSync(`${process.env.pwd}/${foldersWay}/${name}`).isDirectory()) {
+                        matched.push(`${name}/`);
+                    } else {
+                        matched.push(name);
+                    }
+                }
+            });
+            if (matched.length < 1) return;
+            if (matched.length === 1) {
+                controls.buffer = controls.buffer.replace(new RegExp(`${folderName}$`, "i") , matched[0]);
+                controls.cursorPosition = controls.buffer.length;
+                controls.stdout.clearLine();
+                controls.stdout.cursorTo(0);
+                controls.stdout.write(controls.buffer);
+            } else {
+                actions.putInfoInStdOut(matched.join(' '));
+                controls.stdout.write(controls.buffer);
+                controls.cursorPosition = controls.buffer.length;
+            }
+        }
+    },
+    putInfoInStdOut: function(str) {
+        controls.stdout.clearLine();
+        controls.stdout.cursorTo(0);
+        controls.stdout.write(`\r\n${str}\r\n\r\n`);
     }
 };
 
@@ -196,6 +270,7 @@ if (IS_WINDOWS) {
 } else {
     execConsole.keys['\u007F'] = (controls, commands, key) => actions.handleBackSpaceKeyAction(controls, commands, key); // backspace
 }
+execConsole.keys['\u0009'] = (controls, commands, key) => actions.searchFolderByStdin(controls, commands,key); // tab
 execConsole.keys['\u000D'] = (controls, commands, key) => actions.handleCombineActionsForEnterKeyAction(controls, commands, key); // enter
 execConsole.keys['\u001B\u005B\u0041'] = (controls, commands, key) => actions.goUpToCommandsHistory(controls, commands, key); // up
 execConsole.keys['\u001B\u005B\u0042'] = (controls, commands, key) => actions.goDownToCommandsHistory(controls, commands, key); // down

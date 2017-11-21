@@ -8,9 +8,6 @@ const availableCommands = {
         },
         usage: usageMsg
     },
-    'test2': {
-        run: function() {}
-    },
     'test3': {
         run: function() {},
         usage: 'test3 <> test3'
@@ -105,6 +102,59 @@ describe('JS console command executor', () => {
         handleCombineActionsForEnterKeyAction_SPY.reset();
     });
 
+    it('should have action for display info', next => {
+        stdoutMock.rawBuffer = '';
+        let str = 'test';
+        execConsole.actions.putInfoInStdOut(str);
+        expect(stdoutMock.rawBuffer).to.be.equal(`\r\n${str}\r\n\r\n`);
+        next();
+    });
+    it('should handle tab as autocomplete for current folder or files', next => {
+        execConsole.controls.buffer = 'node';
+        stdoutMock.rawBuffer = '';
+        stdinMock.emit('data', '\u0009'); // emulated tab key action
+        expect(stdoutMock.rawBuffer).to.be.equal(`node_modules/`);
+
+        execConsole.controls.buffer = 'example_run';
+        stdoutMock.rawBuffer = '';
+        stdinMock.emit('data', '\u0009'); // emulated tab key action
+        expect(stdoutMock.rawBuffer).to.be.equal(`example_runing.js`);
+
+        execConsole.controls.buffer = 'node_modules/jasmine/bin/';
+        stdoutMock.rawBuffer = '';
+        stdinMock.emit('data', '\u0009'); // emulated tab key action
+        expect(stdoutMock.rawBuffer).to.be.equal('\r\njasmine.js\r\n\r\nnode_modules/jasmine/bin/');
+
+        execConsole.controls.buffer = 'node_modules/jasmine/lib/';
+        stdoutMock.rawBuffer = '';
+        stdinMock.emit('data', '\u0009'); // emulated tab key action
+        assert.isTrue(!!~stdoutMock.rawBuffer.indexOf('jasmine.js'));
+
+        execConsole.controls.buffer = 'node_modules/s';
+        stdoutMock.rawBuffer = '';
+        stdinMock.emit('data', '\u0009'); // emulated tab key action
+        assert.isTrue(!!~stdoutMock.rawBuffer.indexOf('shell-quote'));
+        assert.isTrue(!!~stdoutMock.rawBuffer.indexOf('sinon'));
+
+        stdinMock.emit('data', ' ');
+        execConsole.controls.buffer = ' ';
+        stdoutMock.rawBuffer = '';
+        stdinMock.emit('data', '\u0009'); // emulated tab key action
+        expect(stdoutMock.rawBuffer).to.be.equal('');
+
+        execConsole.controls.buffer = '';
+        stdoutMock.rawBuffer = '';
+        stdinMock.emit('data', '\u0009'); // emulated tab key action
+        expect(stdoutMock.rawBuffer).to.be.equal('');
+
+        stdoutMock.clearLine();
+        stdinMock.emit('data', 'rt/');
+        execConsole.controls.buffer = 'rt/';
+        stdinMock.emit('data', '\u0009'); // emulated tab key action
+        expect(stdoutMock.buffer).to.be.equal('rt/');
+
+        next();
+    });
     it('should allows write to stdout space and keyboards chars with both register', next => {
         let testKey = execConsole.actions.testKeyForAvailableToStdout;
         for (let i = 32; i < 127; i++) {
@@ -148,6 +198,18 @@ describe('JS console command executor', () => {
             stdinMock.emit('data', '\u007F'); // emulated backspace key action
         }
         expect(handleBackSpaceKeyAction_SPY.callCount).to.be.equal(1);
+        // check if cursor position < 0
+        execConsole.controls.buffer = '1234';
+        execConsole.controls.cursorPosition = -1;
+        execConsole.actions.handleBackSpaceKeyAction(execConsole.controls, execConsole.commands);
+        expect(execConsole.controls.cursorPosition).to.be.equal(0);
+        expect(execConsole.controls.buffer).to.be.equal('1234');
+        // check if cursor position = 0
+        execConsole.controls.buffer = '1234';
+        execConsole.controls.cursorPosition = 0;
+        execConsole.actions.handleBackSpaceKeyAction(execConsole.controls, execConsole.commands);
+        expect(execConsole.controls.cursorPosition).to.be.equal(0);
+        expect(execConsole.controls.buffer).to.be.equal('1234');
         next();
     });
     it('should step cursor left to one position after pressed left arrow', next => {
