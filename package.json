@@ -1,5 +1,5 @@
 {
-  "name": "js-console-command-executor",
+  "name": "js_console_command_executor",
   "version": "1.0.5",
   "description": "this scripts will be waiting and execute commands you will give to it.",
   "main": "index.js",
