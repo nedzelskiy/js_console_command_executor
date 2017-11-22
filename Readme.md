@@ -1,8 +1,13 @@
 [![Travis Build Status](https://api.travis-ci.org/nedzelskiy/js_console_command_executor.svg?branch=master)](https://travis-ci.org/nedzelskiy/js_console_command_executor)
+
 ### Review:
 
 This is a script that allows you wrote command and execute it while this script will be listening stdin!
 You can add any handlers for any keys and any commands for run as written below. Enjoy!
+
+### Requirements:
+* Node 4+
+* Npm 2+
 
 ### Install:
 
@@ -88,6 +93,7 @@ execConsole.commands['n'] = {
 ````
 
 Try use it! 
+
 For demo run:
 ````bash
 npm run demo
@@ -95,4 +101,8 @@ npm run demo
 For tests run:
 ````bash
 npm run test
+````
+For code coverage run:
+````bash
+npm run coverage
 ````
