@@ -23,29 +23,39 @@ const mock = require('mock-require');
 const EventEmitter = require('events');
 const IS_WINDOWS = /^win/.test(process.platform);
 
+const test3FolderFiles = [
+    'manyFiles.js',
+    'many.js'
+];
+
+const test2FolderFiles = [
+    'test2.js'
+];
+
+const testFolderFiles = [
+    'test.js'
+];
+
+const currentFolderFiles = [
+    'node_modules',
+    'example_running.js'
+];
+
 mock('fs', {
     readdirSync: (way) => {
         if (!!~way.indexOf(path.normalize('node_modules/test3'))) {
-            return  [
-                'manyFiles.js',
-                'many.js'
-            ];
+            return  test3FolderFiles;
         } else if (!!~way.indexOf(path.normalize('node_modules/test2'))) {
-            return  [
-                'test2.js'
-            ];
+            return test2FolderFiles;
         } else if (!!~way.indexOf(path.normalize('node_modules/test'))) {
-            return  [
-                'test.js'
-            ];
+            return  testFolderFiles;
         } else {
-            return [
-                'node_modules',
-                'example_running.js'
-            ];
+            return currentFolderFiles;
         }
     },
-    existsSync: (way) => { return true; },
+    existsSync: () => {
+        return true;
+    },
     lstatSync: function(way) {
         let answer = true;
         let ext = way.split('.').pop();
@@ -163,7 +173,7 @@ describe('JS console command executor', () => {
         execConsole.controls.buffer = way;
         stdoutMock.rawBuffer = '';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
-        expect(stdoutMock.rawBuffer).to.be.equal(execConsole.actions.putInfoInStdOut(['test.js'].join(' ')) + way);
+        expect(stdoutMock.rawBuffer).to.be.equal(execConsole.actions.putInfoInStdOut(testFolderFiles.join(' ')) + way);
 
         way = 'node_modules/test2';
         execConsole.controls.buffer = `${way}/tes`;
@@ -175,8 +185,7 @@ describe('JS console command executor', () => {
         execConsole.controls.buffer = `${way}`;
         stdoutMock.rawBuffer = '';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
-        expect(stdoutMock.rawBuffer).to.be.equal(execConsole.actions.putInfoInStdOut(['manyFiles.js',
-                'many.js'].join(' ')) + way);
+        expect(stdoutMock.rawBuffer).to.be.equal(execConsole.actions.putInfoInStdOut(test3FolderFiles.join(' ')) + way);
 
         stdinMock.emit('data', ' ');
         execConsole.controls.buffer = ' ';
@@ -184,20 +193,21 @@ describe('JS console command executor', () => {
         stdinMock.emit('data', '\u0009'); // emulated tab key action
         expect(stdoutMock.rawBuffer).to.be.equal('');
 
+        stdinMock.emit('data', '');
         execConsole.controls.buffer = '';
         stdoutMock.rawBuffer = '';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
         expect(stdoutMock.rawBuffer).to.be.equal('');
 
         stdoutMock.clearLine();
-        execConsole.controls.buffer = '';
         stdinMock.emit('data', 'rt/');
+        execConsole.controls.buffer = '';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
         expect(stdoutMock.buffer).to.be.equal('rt/');
 
-        stdoutMock.rawBuffer = '';
         execConsole.controls.cursorPosition = 0;
         execConsole.controls.buffer = '';
+        stdoutMock.rawBuffer = '';
         stdinMock.emit('data', 'gggg');
         stdinMock.emit('data', '\u0009'); // emulated tab key action
         expect(stdoutMock.rawBuffer).to.be.equal('gggg');

@@ -1,5 +1,5 @@
 {
-  "name": "js_console_command_executor",
+  "name": "js-console-command-executor",
   "version": "1.0.5",
   "description": "this scripts will be waiting and execute commands you will give to it.",
   "main": "index.js",
@@ -9,13 +9,15 @@
     "demo": "node example_running.js"
   },
   "keywords": [
-    "javascript",
-    "js",
     "js console",
     "javascript console",
+    "javascript",
+    "js",
     "console",
     "executor",
     "command",
+    "key",
+    "keyboard",
     "bash",
     "sh"
   ],
