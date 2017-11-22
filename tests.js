@@ -14,12 +14,51 @@ const availableCommands = {
     }
 };
 
-const sinon = require('sinon');
-const EventEmitter = require('events');
 const chai = require('chai');
-const IS_WINDOWS = /^win/.test(process.platform);
 const expect = chai.expect;
 const assert = chai.assert;
+const path = require('path');
+const sinon = require('sinon');
+const mock = require('mock-require');
+const EventEmitter = require('events');
+const IS_WINDOWS = /^win/.test(process.platform);
+
+mock('fs', {
+    readdirSync: (way) => {
+        if (!!~way.indexOf(path.normalize('node_modules/test3'))) {
+            return  [
+                'manyFiles.js',
+                'many.js'
+            ];
+        } else if (!!~way.indexOf(path.normalize('node_modules/test2'))) {
+            return  [
+                'test2.js'
+            ];
+        } else if (!!~way.indexOf(path.normalize('node_modules/test'))) {
+            return  [
+                'test.js'
+            ];
+        } else {
+            return [
+                'node_modules',
+                'example_running.js'
+            ];
+        }
+    },
+    existsSync: (way) => { return true; },
+    lstatSync: function(way) {
+        let answer = true;
+        let ext = way.split('.').pop();
+        if (ext === 'js') {
+            answer = false;
+        }
+        return {
+            isDirectory: () => {
+                return answer;
+            }
+        }
+    }
+});
 const execConsole = require('./index.js')(availableCommands);
 
 let stdoutMock = {
@@ -81,7 +120,6 @@ let startedTypedCommandsPointerPosition = execConsole.controls.typedCommandsPoin
 execConsole();
 
 describe('JS console command executor', () => {
-
     beforeEach(() => {
         stdoutMock.buffer = '';
         execConsole.controls.buffer = '';
@@ -115,26 +153,30 @@ describe('JS console command executor', () => {
         stdinMock.emit('data', '\u0009'); // emulated tab key action
         expect(stdoutMock.rawBuffer).to.be.equal(`node_modules/`);
 
+
         execConsole.controls.buffer = 'example_run';
         stdoutMock.rawBuffer = '';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
-        expect(stdoutMock.rawBuffer).to.be.equal(`example_runing.js`);
+        expect(stdoutMock.rawBuffer).to.be.equal(`example_running.js`);
 
-        execConsole.controls.buffer = 'node_modules/jasmine/bin/';
+        let way = 'node_modules/test/';
+        execConsole.controls.buffer = way;
         stdoutMock.rawBuffer = '';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
-        expect(stdoutMock.rawBuffer).to.be.equal('\r\njasmine.js\r\n\r\nnode_modules/jasmine/bin/');
+        expect(stdoutMock.rawBuffer).to.be.equal(execConsole.actions.putInfoInStdOut(['test.js'].join(' ')) + way);
 
-        execConsole.controls.buffer = 'node_modules/jasmine/lib/';
+        way = 'node_modules/test2';
+        execConsole.controls.buffer = `${way}/tes`;
         stdoutMock.rawBuffer = '';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
-        assert.isTrue(!!~stdoutMock.rawBuffer.indexOf('jasmine.js'));
+        expect(stdoutMock.rawBuffer).to.be.equal(`${way}/test2.js`);
 
-        execConsole.controls.buffer = 'node_modules/s';
+        way = 'node_modules/test3/many';
+        execConsole.controls.buffer = `${way}`;
         stdoutMock.rawBuffer = '';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
-        assert.isTrue(!!~stdoutMock.rawBuffer.indexOf('shell-quote'));
-        assert.isTrue(!!~stdoutMock.rawBuffer.indexOf('sinon'));
+        expect(stdoutMock.rawBuffer).to.be.equal(execConsole.actions.putInfoInStdOut(['manyFiles.js',
+                'many.js'].join(' ')) + way);
 
         stdinMock.emit('data', ' ');
         execConsole.controls.buffer = ' ';

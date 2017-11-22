@@ -240,9 +240,11 @@ const actions = {
         }
     },
     putInfoInStdOut: function(str) {
+        let stdoutLine = `\r\n${str}\r\n\r\n`;
         controls.stdout.clearLine();
         controls.stdout.cursorTo(0);
-        controls.stdout.write(`\r\n${str}\r\n\r\n`);
+        controls.stdout.write(stdoutLine);
+        return stdoutLine;
     }
 };
 
