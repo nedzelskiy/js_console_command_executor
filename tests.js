@@ -53,7 +53,10 @@ mock('fs', {
             return currentFolderFiles;
         }
     },
-    existsSync: () => {
+    existsSync: (way) => {
+        if (!!~way.indexOf('rt')) {
+            return false;
+        }
         return true;
     },
     lstatSync: function(way) {
@@ -173,7 +176,8 @@ describe('JS console command executor', () => {
         execConsole.controls.buffer = way;
         stdoutMock.rawBuffer = '';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
-        expect(stdoutMock.rawBuffer).to.be.equal(execConsole.actions.putInfoInStdOut(testFolderFiles.join(' ')) + way);
+        let separated = execConsole.controls.separatorOfAutoCompletedList;
+        expect(stdoutMock.rawBuffer).to.be.equal(execConsole.actions.putInfoInStdOut(testFolderFiles.join(separated)) + way);
 
         way = 'node_modules/test2';
         execConsole.controls.buffer = `${way}/tes`;
@@ -185,25 +189,27 @@ describe('JS console command executor', () => {
         execConsole.controls.buffer = `${way}`;
         stdoutMock.rawBuffer = '';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
-        expect(stdoutMock.rawBuffer).to.be.equal(execConsole.actions.putInfoInStdOut(test3FolderFiles.join(' ')) + way);
+        separated = execConsole.controls.separatorOfAutoCompletedList;
+        expect(stdoutMock.rawBuffer).to.be.equal(execConsole.actions.putInfoInStdOut(test3FolderFiles.join(separated)) + way);
 
-        stdinMock.emit('data', ' ');
-        execConsole.controls.buffer = ' ';
+        way = ' ';
+        stdinMock.emit('data', way);
+        execConsole.controls.buffer = way;
         stdoutMock.rawBuffer = '';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
-        expect(stdoutMock.rawBuffer).to.be.equal('');
+        expect(stdoutMock.rawBuffer).to.be.equal(execConsole.actions.putInfoInStdOut(currentFolderFiles.join(separated)) + way);
 
-        stdinMock.emit('data', '');
-        execConsole.controls.buffer = '';
+        way = '';
+        stdinMock.emit('data', way);
+        execConsole.controls.buffer = way;
         stdoutMock.rawBuffer = '';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
-        expect(stdoutMock.rawBuffer).to.be.equal('');
+        expect(stdoutMock.rawBuffer).to.be.equal(execConsole.actions.putInfoInStdOut(currentFolderFiles.join(separated)) + way);
 
-        stdoutMock.clearLine();
+        stdoutMock.rawBuffer = '';
         stdinMock.emit('data', 'rt/');
-        execConsole.controls.buffer = '';
         stdinMock.emit('data', '\u0009'); // emulated tab key action
-        expect(stdoutMock.buffer).to.be.equal('rt/');
+        expect(stdoutMock.rawBuffer).to.be.equal('rt/');
 
         execConsole.controls.cursorPosition = 0;
         execConsole.controls.buffer = '';

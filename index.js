@@ -14,11 +14,15 @@ const controls = {
     commandLine: '',
     cursorPosition: 0,
     typedCommands: [],
-    typedCommandsPointer: -1
+    typedCommandsPointer: -1,
+    separatorOfAutoCompletedList: '  '
 };
 
 const actions = {
     doExit: function (controls, commands, key) {
+        process.exit(0);
+    },
+    doHardExit: function (controls, commands, key) {
         terminate(process.pid, 'SIGKILL', err => {
             if (err) {
                 controls.stdout.write(`${FILENAME} ERROR: ` + "\r\n" + err + "\r\n");
@@ -178,13 +182,18 @@ const actions = {
     },
     searchFolderByStdin: function(controls, commands, key) {
         // if last buffer symbol isn't space or tab
-        if (/[\s\t]+/.test(controls.buffer[controls.buffer.length - 1])) {
+        if (/[\s\t"']+/.test(controls.buffer[controls.buffer.length - 1])) {
+            actions.showAutoCompletedListOfMatched(fs.readdirSync(__dirname));
             return;
         }
         let matched = []
             ,parsedBuffer = parse(controls.buffer)
             ;
-        if (parsedBuffer.length < 1) return;
+
+        if (parsedBuffer.length < 1) {
+            actions.showAutoCompletedListOfMatched(fs.readdirSync(__dirname));
+            return;
+        }
 
         let folders = parsedBuffer.pop().split('/');
 
@@ -199,9 +208,7 @@ const actions = {
 
             if (!fs.existsSync(way)) return;
 
-            actions.putInfoInStdOut( fs.readdirSync(way).join(' '));
-            controls.stdout.write(controls.buffer);
-            controls.cursorPosition = controls.buffer.length;
+            actions.showAutoCompletedListOfMatched(fs.readdirSync(way));
         } else {
             let folderName = folders[folders.length - 1]
                 ,foldersWay = ''
@@ -233,11 +240,14 @@ const actions = {
                 controls.stdout.cursorTo(0);
                 controls.stdout.write(controls.buffer);
             } else {
-                actions.putInfoInStdOut(matched.join(' '));
-                controls.stdout.write(controls.buffer);
-                controls.cursorPosition = controls.buffer.length;
+                actions.showAutoCompletedListOfMatched(matched);
             }
         }
+    },
+    showAutoCompletedListOfMatched: function(listArr) {
+        actions.putInfoInStdOut(listArr.join(controls.separatorOfAutoCompletedList));
+        controls.stdout.write(controls.buffer);
+        controls.cursorPosition = controls.buffer.length;
     },
     putInfoInStdOut: function(str) {
         let stdoutLine = `\r\n${str}\r\n\r\n`;
