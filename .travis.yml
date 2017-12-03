@@ -8,3 +8,7 @@ script: npm run test
 install: true
 before_script:
   - npm i
+os:
+  - linux
+  - osx
+  - windows

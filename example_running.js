@@ -17,16 +17,16 @@ const availableCommands = {
                 if (err) {
                     console.error(err);
                 } else {
-                    console.log(`Command KILL ${pid} executed with signal [${signal}]!`);
+                    console.log(`Command KILL ${ pid } executed with signal [${signal}]!`);
                 }
             });
         }
     },
     'exit': {
         run: function() {
-            const signal = 'SIGTERM';
-            console.log(`Command exit ${process.id} will be executed with signal [${signal}]!`);
-            terminate(process.pid, 'SIGTERM', err => {
+            const signal = 'SIGINT';
+            console.log(`Command exit for process "${ process.pid }" will be executed with signal [${signal}]!`);
+            terminate(process.pid, 'SIGINT', err => {
                 if (err) {
                     console.error(err);
                 } 

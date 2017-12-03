@@ -196,7 +196,6 @@ const actions = {
         }
 
         let folders = parsedBuffer.pop().split('/');
-
         if (folders[folders.length - 1] === '') { // do list of all folders in way
             let foldersWay = folders[0];
 
@@ -204,7 +203,7 @@ const actions = {
                 foldersWay = foldersWay + `/${folders[i]}`;
             }
 
-            let way = path.normalize(`${process.env.pwd}/${foldersWay}`);
+            let way = path.normalize(`${process.env.PWD}/${foldersWay}`);
 
             if (!fs.existsSync(way)) return;
 
@@ -217,7 +216,7 @@ const actions = {
             for (let i = 0; i < folders.length - 1; i++) {
                 foldersWay = foldersWay + `/${folders[i]}`;
             }
-            let way = path.normalize(`${process.env.pwd}/${foldersWay}`);
+            let way = path.normalize(`${ process.env.PWD }/${foldersWay}`);
 
             if (!fs.existsSync(way)) return;
 
@@ -225,7 +224,7 @@ const actions = {
             folderContent.forEach(name => {
                 let regex = new RegExp(`^${folderName}`, "i");
                 if (regex.test(name)) {
-                    if (fs.lstatSync(`${process.env.pwd}/${foldersWay}/${name}`).isDirectory()) {
+                    if (fs.lstatSync(`${ process.env.PWD }/${foldersWay}/${name}`).isDirectory()) {
                         matched.push(`${name}/`);
                     } else {
                         matched.push(name);
