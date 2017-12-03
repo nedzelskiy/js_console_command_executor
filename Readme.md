@@ -7,7 +7,9 @@ You can add any handlers for any keys and any commands for run as written below.
 In js console you can use "tab" for auto complete names folders and files, "backspace",
 move cursor position by arrow keys "left" and "right", view history of typed commands
 by using arrow keys "up" and "down" and much more...
-Enjoy! Run demo with:
+Enjoy!
+
+Run demo with:
 
 ````bash
 npm run demo
@@ -82,12 +84,12 @@ execConsole.keys['\u007B'] = (controls, commands) => {
     }
 };
 ````
-Optionally you can rebind standard handler. Rebind logic for "combineActionsForEnterHandle":
+Optionally you can rebind standard handler. Rebind logic for "handleCombineActionsForEnterKeyAction":
 ````javascript
-execConsole.actions.combineActionsForEnterHandle = function() {
-    console.log("\r\n\r\nThis is a logger! From rebind standard handler \"combineActionsForEnterHandle\"!");
-    this.enterActionHandle(execConsole.controls);
-    this.executeCommand(execConsole.controls, execConsole.commands);
+execConsole.actions.handleCombineActionsForEnterKeyAction = function() {
+    console.log(`\r\n\r\nThis is a logger! From rebind standard handler "handleCombineActionsForEnterKeyAction"!`);
+    execConsole.actions.handleEnterKeyAction(execConsole.controls);
+    execConsole.actions.executeCommand(execConsole.controls, execConsole.commands);
 };
 ````
 
