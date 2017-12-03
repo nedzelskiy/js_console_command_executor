@@ -5,6 +5,10 @@
 This is a script that allows you wrote command and execute it while this script will be listening stdin!
 You can add any handlers for any keys and any commands for run as written below. Enjoy!
 
+### Why?
+
+Exists situations, especially in development, when you need send to running process some control commands, for example for restart build task (like "rs" in nodemon https://www.npmjs.com/package/nodemon) or something ggod else. What exactly? You can add every command that you want!
+
 ### Requirements:
 * Node 4+
 * Npm 2+

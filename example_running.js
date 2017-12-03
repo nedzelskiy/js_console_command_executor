@@ -17,7 +17,7 @@ const availableCommands = {
                 if (err) {
                     console.error(err);
                 } else {
-                    console.log(`Command KILL ${ pid } executed with signal [${signal}]!`);
+                    console.log(`Command KILL for process "${ pid }" executed with signal [${ signal }]!`);
                 }
             });
         }
@@ -25,7 +25,7 @@ const availableCommands = {
     'exit': {
         run: function() {
             const signal = 'SIGINT';
-            console.log(`Command exit for process "${ process.pid }" will be executed with signal [${signal}]!`);
+            console.log(`Command EXIT for process "${ process.pid }" will be executed with signal [${ signal }]!`);
             terminate(process.pid, 'SIGINT', err => {
                 if (err) {
                     console.error(err);
@@ -70,4 +70,17 @@ execConsole.commands['n'] = {
     },
     usage: 'n <> just a new added command!'
 };
+console.log(`
+This is a demo!
+Available commands:
+- help
+- k
+- exit
 
+You can use "tab" for autocomplete name folders and files, "backspace", move cursor position by
+arrow keys "left" and "right", view history of typed commands by using arrow keys "up" and "down"
+and much more...
+
+Let's go!
+
+`);

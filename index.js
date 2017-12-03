@@ -25,7 +25,7 @@ const actions = {
     doHardExit: function (controls, commands, key) {
         terminate(process.pid, 'SIGKILL', err => {
             if (err) {
-                controls.stdout.write(`${FILENAME} ERROR: ` + "\r\n" + err + "\r\n");
+                controls.stdout.write(`${ FILENAME } ERROR: ` + "\r\n" + err + "\r\n");
             }
         });
     },
@@ -105,12 +105,12 @@ const actions = {
                 if (strLine[1] && '' !== strLine[1]) {
                     textLine = textLine + strLine[1];
                 }
-                commandsList.push(` ${textLine} \r\n`);
+                commandsList.push(` ${ textLine } \r\n`);
             } else {
-                commandsList.push(` Not declared help for command "${key}" in object key "usage"! \r\n`);
+                commandsList.push(` Not declared help for command "${ key }" in object key "usage"! \r\n`);
             }
         }
-        controls.stdout.write(`${FILENAME}: Available commands are: \r\n\r\n${commandsList.join('') }` + "\r\n");
+        controls.stdout.write(`${ FILENAME }: Available commands are: \r\n\r\n${ commandsList.join('') }` + "\r\n");
     },
     executeCommand: function (controls, commands, key) {
         const commandChunks = parse(controls.commandLine);
@@ -121,7 +121,7 @@ const actions = {
         } else if ('help' === command) {
             actions.handleHelpCommand(controls, commands);
         } else {
-            controls.stdout.write(`${FILENAME}: Command "${controls.commandLine}" not recognized! Use help command!` + "\r\n");
+            controls.stdout.write(`${ FILENAME }: Command "${ controls.commandLine }" not recognized! Use help command!` + "\r\n");
         }
         controls.commandLine = '';
     },
@@ -200,10 +200,10 @@ const actions = {
             let foldersWay = folders[0];
 
             for (let i = 1; i < folders.length - 1; i++) {
-                foldersWay = foldersWay + `/${folders[i]}`;
+                foldersWay = foldersWay + `/${ folders[i] }`;
             }
 
-            let way = path.normalize(`${process.env.PWD}/${foldersWay}`);
+            let way = path.normalize(`${ process.env.PWD }/${ foldersWay }`);
 
             if (!fs.existsSync(way)) return;
 
@@ -214,18 +214,18 @@ const actions = {
                 ;
 
             for (let i = 0; i < folders.length - 1; i++) {
-                foldersWay = foldersWay + `/${folders[i]}`;
+                foldersWay = foldersWay + `/${ folders[i] }`;
             }
-            let way = path.normalize(`${ process.env.PWD }/${foldersWay}`);
+            let way = path.normalize(`${  process.env.PWD }/${ foldersWay }`);
 
             if (!fs.existsSync(way)) return;
 
             const folderContent = fs.readdirSync(way);
             folderContent.forEach(name => {
-                let regex = new RegExp(`^${folderName}`, "i");
+                let regex = new RegExp(`^${ folderName }`, "i");
                 if (regex.test(name)) {
-                    if (fs.lstatSync(`${ process.env.PWD }/${foldersWay}/${name}`).isDirectory()) {
-                        matched.push(`${name}/`);
+                    if (fs.lstatSync(`${ process.env.PWD }/${ foldersWay }/${ name }`).isDirectory()) {
+                        matched.push(`${ name }/`);
                     } else {
                         matched.push(name);
                     }
@@ -233,7 +233,7 @@ const actions = {
             });
             if (matched.length < 1) return;
             if (matched.length === 1) {
-                controls.buffer = controls.buffer.replace(new RegExp(`${folderName}$`, "i") , matched[0]);
+                controls.buffer = controls.buffer.replace(new RegExp(`${ folderName }$`, "i") , matched[0]);
                 controls.cursorPosition = controls.buffer.length;
                 controls.stdout.clearLine();
                 controls.stdout.cursorTo(0);
@@ -249,7 +249,7 @@ const actions = {
         controls.cursorPosition = controls.buffer.length;
     },
     putInfoInStdOut: function(str) {
-        let stdoutLine = `\r\n${str}\r\n\r\n`;
+        let stdoutLine = `\r\n${ str }\r\n\r\n`;
         controls.stdout.clearLine();
         controls.stdout.cursorTo(0);
         controls.stdout.write(stdoutLine);
@@ -266,7 +266,7 @@ let execConsole = function() {
     controls.stdin.on('data', (key) => {
         actions.keyHandler(key, execConsole.keys, execConsole.commands, execConsole.controls);
     });
-    controls.stdout.write(`${FILENAME}: watching for commands! type help for list of commands!` + "\r\n");
+    controls.stdout.write(`${ FILENAME }: watching for commands! type help for list of commands!` + "\r\n");
 };
 execConsole.keys = {};
 execConsole.commands = {};
@@ -294,7 +294,7 @@ module.exports = (commands) => {
         isExistCommand = true;
     }
     if (!isExistCommand) {
-        console.log(`${FILENAME}: Object of given commands is empty!`); actions.doExit(); return {};
+        console.log(`${ FILENAME }: Object of given commands is empty!`); actions.doExit(); return {};
     } else {
         execConsole.commands = commands;
         return execConsole;
