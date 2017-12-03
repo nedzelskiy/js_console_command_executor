@@ -7,7 +7,7 @@ You can add any handlers for any keys and any commands for run as written below.
 
 ### Why?
 
-Exists situations, especially in development, when you need send to running process some control commands, for example for restart build task (like "rs" in nodemon https://www.npmjs.com/package/nodemon) or something ggod else. What exactly? You can add every command that you want!
+Exists situations, especially in development, when you need send to running process some control commands, for example for restart build task (like "rs" in nodemon https://www.npmjs.com/package/nodemon) or something good else. What exactly? You can add every command that you want!
 
 ### Requirements:
 * Node 4+
