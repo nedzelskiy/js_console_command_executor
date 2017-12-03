@@ -53,11 +53,11 @@ execConsole.keys['\u007B'] = (controls, commands) => {
     }
 };
 
-// rebind standard handler "combineActionsForEnterHandle"
-execConsole.actions.combineActionsForEnterHandle = function() {
-    console.log("\r\n\r\nThis is a logger! From rebind standard handler \"combineActionsForEnterHandle\"!");
-    this.enterActionHandle(execConsole.controls);
-    this.executeCommand(execConsole.controls, execConsole.commands);
+// rebind standard handler "handleCombineActionsForEnterKeyAction"
+execConsole.actions.handleCombineActionsForEnterKeyAction = function() {
+    console.log(`\r\n\r\nThis is a logger! From rebind standard handler "handleCombineActionsForEnterKeyAction"!`);
+    execConsole.actions.handleEnterKeyAction(execConsole.controls);
+    execConsole.actions.executeCommand(execConsole.controls, execConsole.commands);
 };
 
 // run script
@@ -81,6 +81,6 @@ You can use "tab" for autocomplete name folders and files, "backspace", move cur
 arrow keys "left" and "right", view history of typed commands by using arrow keys "up" and "down"
 and much more...
 
-Let's go!
+Let's go! Type command!
 
 `);

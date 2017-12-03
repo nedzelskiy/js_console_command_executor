@@ -3,11 +3,21 @@
 ### Review:
 
 This is a script that allows you wrote command and execute it while this script will be listening stdin!
-You can add any handlers for any keys and any commands for run as written below. Enjoy!
+You can add any handlers for any keys and any commands for run as written below.
+In js console you can use "tab" for auto complete names folders and files, "backspace",
+move cursor position by arrow keys "left" and "right", view history of typed commands
+by using arrow keys "up" and "down" and much more...
+Enjoy! Run demo with:
+
+````bash
+npm run demo
+````
 
 ### Why?
 
-Exists situations, especially in development, when you need send to running process some control commands, for example for restart build task (like "rs" in nodemon https://www.npmjs.com/package/nodemon) or something good else. What exactly? You can add every command that you want!
+Exists situations, especially in development, when you need send to running process some control commands,
+for example for restart build task (like "rs" in nodemon https://www.npmjs.com/package/nodemon) or something good else.
+What exactly? You can add every command that you want!
 
 ### Requirements:
 * Node 4+
