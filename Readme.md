@@ -86,10 +86,10 @@ execConsole.keys['\u007B'] = (controls, commands) => {
 ````
 Optionally you can rebind standard handler. Rebind logic for "handleCombineActionsForEnterKeyAction":
 ````javascript
-const save__handleCombineActionsForEnterKeyAction = execConsole.actions.handleCombineActionsForEnterKeyAction;
+const savedAction = execConsole.actions.handleCombineActionsForEnterKeyAction;
 execConsole.actions.handleCombineActionsForEnterKeyAction = function() {
     console.log(`\r\n\r\nThis is a logger! From rebind standard handler "handleCombineActionsForEnterKeyAction"!`);
-    save__handleCombineActionsForEnterKeyAction(execConsole.controls, execConsole.commands);
+    savedAction(execConsole.controls, execConsole.commands);
 };
 ````
 
