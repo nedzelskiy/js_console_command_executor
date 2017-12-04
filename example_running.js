@@ -49,7 +49,7 @@ execConsole.keys['\u0011'] = (controls, commands) => {
 execConsole.keys['\u007B'] = (controls, commands) => {
     if (controls.cursorPosition > 1) {
         controls.cursorPosition = controls.cursorPosition - 2;
-        process.stdout.cursorTo(controls.cursorPosition);
+        execConsole.controls.stdout.cursorTo(controls.cursorPosition);
     }
 };
 
