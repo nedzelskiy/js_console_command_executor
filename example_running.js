@@ -54,10 +54,10 @@ execConsole.keys['\u007B'] = (controls, commands) => {
 };
 
 // rebind standard handler "handleCombineActionsForEnterKeyAction"
+const save__handleCombineActionsForEnterKeyAction = execConsole.actions.handleCombineActionsForEnterKeyAction;
 execConsole.actions.handleCombineActionsForEnterKeyAction = function() {
     console.log(`\r\n\r\nThis is a logger! From rebind standard handler "handleCombineActionsForEnterKeyAction"!`);
-    execConsole.actions.handleEnterKeyAction(execConsole.controls);
-    execConsole.actions.executeCommand(execConsole.controls, execConsole.commands);
+    save__handleCombineActionsForEnterKeyAction(execConsole.controls, execConsole.commands);
 };
 
 // run script
